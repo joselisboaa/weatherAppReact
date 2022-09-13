@@ -5,7 +5,8 @@ import { WeatherCard } from '../WeatherCardComponent';
 
 export const WheaterForm = () => {
 
-  const [cities, setCities]= useState([]);
+  const [cities, setCities] = useState([]);
+  const [citiesError, setCitiesError] = useState([]);
 
   const formik = useFormik({
     initialValues: {
@@ -13,11 +14,18 @@ export const WheaterForm = () => {
     },
     onSubmit: values => {
       setCities([]);
-      weatherDataFetching(values.SearchedValue).then(data => {
-        setCities([data.data]);
-      });
+      weatherDataFetching(values.SearchedValue)
+        .then(data => {
+          setCitiesError([]);
+          setCities([data.data]);
+        })
+        .catch(error => {
+          setCitiesError([error]);
+        })
     }
   });
+
+  console.count("render: ");
 
   return (
     <Formik 
@@ -35,7 +43,7 @@ export const WheaterForm = () => {
               <input type="submit" value="Buscar"/>
             </Form>
             {cities.length > 0 && <WeatherCard props={cities}/>} 
-            {cities.length === 0 && <p>Cidade não encontrada</p>} 
+            {citiesError.length > 0 && <div>Cidade não encontrada!</div>} 
           </>
         )}
     </Formik>
